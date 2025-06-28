@@ -8,17 +8,32 @@
     <input type="password" id="password" placeholder="Password" />
     <button onclick="login()">Login</button>
   </div>
+
   <script>
     async function login() {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: document.getElementById("email").value,
-          password: document.getElementById("password").value
-        })
-      });
-      if (res.ok) window.location.href = "quiz.html";
+      try {
+        const res = await fetch("https://quiz-ag93.onrender.com/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value
+          })
+        });
+
+        const data = await res.json();
+        console.log("Response:", data);
+
+        if (res.ok) {
+          localStorage.setItem("token", data.token);
+          window.location.href = "quiz.html";
+        } else {
+          alert(data.message || "Login failed");
+        }
+      } catch (err) {
+        console.error("Login error:", err);
+        alert("Failed to connect to server.");
+      }
     }
   </script>
 </body>
