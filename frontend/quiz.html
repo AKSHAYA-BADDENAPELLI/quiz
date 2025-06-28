@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head><title>Quiz</title><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="container">
+    <div id="quiz-box">
+      <h2 id="question"></h2>
+      <div id="options"></div>
+      <button onclick="next()">Next</button>
+    </div>
+  </div>
+  <script>
+    let questions = [], current = 0, score = 0;
+
+    async function loadQuiz() {
+      const res = await fetch("http://localhost:5000/api/quiz/questions");
+      questions = await res.json();
+      showQuestion();
+    }
+
+    function showQuestion() {
+      if (current >= questions.length) {
+        localStorage.setItem("score", score);
+        window.location.href = "result.html";
+        return;
+      }
+      const q = questions[current];
+      document.getElementById("question").textContent = q.question;
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
+      q.options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.onclick = () => {
+          if (opt === q.answer) score++;
+          current++;
+          showQuestion();
+        };
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function next() {
+      current++;
+      showQuestion();
+    }
+
+    loadQuiz();
+  </script>
+</body>
+</html>
